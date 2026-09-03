@@ -318,9 +318,6 @@ const QUESTION_BANK = {
   ],
 };
 
-// ============================================================
-//  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ============================================================
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -333,9 +330,6 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// ============================================================
-//  ИГРОВОЙ ДВИЖОК
-// ============================================================
 const container = document.getElementById('messageContainer');
 const input = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -347,7 +341,6 @@ let timerSeconds = 30;
 let gameOver = false;
 let waitingForAnswer = false;
 let isProcessing = false;
-let timerId = 0; // Уникальный идентификатор для таймера
 
 // ---- Звуки ----
 function playBeep(freq = 800, duration = 120, type = 'sine') {
@@ -372,16 +365,9 @@ function addMessage(text, type = 'in', timer = null, extra = null) {
   const div = document.createElement('div');
   div.className = `bubble ${type}`;
   let html = '';
-  
   if (timer !== null && timer > 0) {
-    timerId++;
-    const uniqueTimerId = `timer_${timerId}`;
-    html += `<div class="timer-badge" id="${uniqueTimerId}">⏳ ${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}</div>`;
-    // Сохраняем ID таймера для обновления
-    div.dataset.timerId = uniqueTimerId;
-    div.dataset.timerSeconds = timer;
+    html += `<div class="timer-badge" id="activeTimer">⏳ ${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}</div>`;
   }
-  
   html += text;
   if (extra) html += extra;
   const timeNow = new Date();
@@ -393,7 +379,6 @@ function addMessage(text, type = 'in', timer = null, extra = null) {
   if (type !== 'out') {
     playBeep(600, 60);
   }
-  return div;
 }
 
 function addSystemMessage(text) {
@@ -410,25 +395,16 @@ function startTimer(seconds) {
   stopTimer();
   timerSeconds = seconds;
   waitingForAnswer = true;
-  
-  // Находим последнее сообщение с таймером
-  const lastMessage = container.querySelector('.bubble.in:last-child');
-  const timerEl = lastMessage ? document.getElementById(lastMessage.dataset.timerId) : null;
-  
+  const timerEl = document.getElementById('activeTimer');
   if (timerEl) {
     timerEl.textContent = `⏳ ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
   }
-  
   timerInterval = setInterval(() => {
     timerSeconds--;
-    
-    // Обновляем таймер в последнем сообщении
-    const lastMsg = container.querySelector('.bubble.in:last-child');
-    const timerElem = lastMsg ? document.getElementById(lastMsg.dataset.timerId) : null;
-    if (timerElem) {
-      timerElem.textContent = `⏳ ${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`;
+    const el = document.getElementById('activeTimer');
+    if (el) {
+      el.textContent = `⏳ ${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`;
     }
-    
     if (timerSeconds <= 0) {
       stopTimer();
       waitingForAnswer = false;
@@ -456,7 +432,6 @@ function handleTimeout() {
   playBeep(300, 400, 'sawtooth');
 }
 
-// ---- Показ вопроса с кнопками ----
 function showQuestion(q, level) {
   if (gameOver || isProcessing) return;
   
@@ -475,7 +450,6 @@ function showQuestion(q, level) {
   addMessage(html, 'in', 30);
   startTimer(30);
 
-  // Вешаем обработчики на кнопки
   setTimeout(() => {
     const btns = container.querySelectorAll('.option-btn');
     btns.forEach(btn => {
@@ -483,8 +457,7 @@ function showQuestion(q, level) {
         if (gameOver || !waitingForAnswer || isProcessing) return;
         const isCorrect = this.dataset.correct === 'true';
         const answerText = this.dataset.answer;
-        
-        // блокируем все кнопки
+    
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         stopTimer();
         waitingForAnswer = false;
@@ -493,8 +466,7 @@ function showQuestion(q, level) {
         if (isCorrect) {
           addMessage(`✅ Верно! ${answerText}`, 'out');
           playBeep(1200, 150);
-          
-          // Переход к следующему уровню
+
           setTimeout(() => {
             isProcessing = false;
             goToNextLevel(level);
@@ -502,8 +474,6 @@ function showQuestion(q, level) {
         } else {
           addMessage(`❌ Неверно. Попробуй ещё раз.`, 'out');
           playBeep(200, 300, 'square');
-          
-          // Даём ещё шанс: перезапускаем вопрос с новым вариантом
           setTimeout(() => {
             isProcessing = false;
             if (!gameOver) {
@@ -518,16 +488,13 @@ function showQuestion(q, level) {
   }, 100);
 }
 
-// ---- Переход между уровнями ----
 function goToNextLevel(currentLevel) {
   if (gameOver) return;
   
   const levelOrder = ['easy', 'medium', 'hard'];
   const currentIndex = levelOrder.indexOf(currentLevel);
   
-  // Если это intro или мы на последнем уровне - финал
   if (currentLevel === 'intro' || currentIndex === -1) {
-    // Переходим на easy
     setTimeout(() => {
       const q = pickRandom(QUESTION_BANK.easy);
       showQuestion(q, 'easy');
@@ -535,7 +502,6 @@ function goToNextLevel(currentLevel) {
     return;
   }
   
-  // Если есть следующий уровень
   if (currentIndex < levelOrder.length - 1) {
     const nextLevel = levelOrder[currentIndex + 1];
     setTimeout(() => {
@@ -557,12 +523,10 @@ function goToNextLevel(currentLevel) {
   }
 }
 
-// ---- Обработка ввода ----
 function handleTextAnswer(text) {
   addSystemMessage('⛔ Используй кнопки для ответа!');
 }
 
-// ---- Инициализация ----
 function init() {
   sendBtn.addEventListener('click', () => {
     const text = input.value.trim();
@@ -576,7 +540,6 @@ function init() {
     if (e.key === 'Enter') sendBtn.click();
   });
 
-  // Запуск - вступление
   addSystemMessage('🔓 доступ к аккаунту брата получен · файлы зашифрованы');
   setTimeout(() => {
     const q = pickRandom(QUESTION_BANK.easy);
