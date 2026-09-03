@@ -261,9 +261,7 @@
 </div>
 
 <script>
-// ============================================================
-//  БОЛЬШАЯ БАЗА ВОПРОСОВ
-// ============================================================
+
 const QUESTION_BANK = {
   easy: [
     { q: 'Какого цвета небо?', options: ['Синий', 'Красный', 'Зелёный'], correct: 0 },
@@ -341,33 +339,65 @@ let timerSeconds = 30;
 let gameOver = false;
 let waitingForAnswer = false;
 let isProcessing = false;
+let timerId = 0;
+let audioCtx = null;
 
-// ---- Звуки ----
+function initAudio() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (_) {
+  
+      audioCtx = null;
+    }
+  }
+
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+}
+
 function playBeep(freq = 800, duration = 120, type = 'sine') {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + duration / 1000);
-  } catch (_) {}
+    initAudio();
+    if (!audioCtx) return;
+    
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.type = type;
+    oscillator.frequency.value = freq;
+    
+    gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duration / 1000);
+  } catch (_) {
+  }
 }
-function playGlitch() { playBeep(1800, 80, 'square'); setTimeout(() => playBeep(900, 100, 'sawtooth'), 100); }
 
-// ---- Добавление сообщений ----
+function playGlitch() { 
+  playBeep(1800, 80, 'square'); 
+  setTimeout(() => playBeep(900, 100, 'sawtooth'), 100); 
+}
+
 function addMessage(text, type = 'in', timer = null, extra = null) {
   const div = document.createElement('div');
   div.className = `bubble ${type}`;
   let html = '';
+  
   if (timer !== null && timer > 0) {
-    html += `<div class="timer-badge" id="activeTimer">⏳ ${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}</div>`;
+    timerId++;
+    const uniqueTimerId = `timer_${timerId}`;
+    html += `<div class="timer-badge" id="${uniqueTimerId}">⏳ ${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}</div>`;
+    div.dataset.timerId = uniqueTimerId;
+    div.dataset.timerSeconds = timer;
   }
+  
   html += text;
   if (extra) html += extra;
   const timeNow = new Date();
@@ -379,6 +409,7 @@ function addMessage(text, type = 'in', timer = null, extra = null) {
   if (type !== 'out') {
     playBeep(600, 60);
   }
+  return div;
 }
 
 function addSystemMessage(text) {
@@ -395,16 +426,23 @@ function startTimer(seconds) {
   stopTimer();
   timerSeconds = seconds;
   waitingForAnswer = true;
-  const timerEl = document.getElementById('activeTimer');
+  
+  const lastMessage = container.querySelector('.bubble.in:last-child');
+  const timerEl = lastMessage ? document.getElementById(lastMessage.dataset.timerId) : null;
+  
   if (timerEl) {
     timerEl.textContent = `⏳ ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
   }
+  
   timerInterval = setInterval(() => {
     timerSeconds--;
-    const el = document.getElementById('activeTimer');
-    if (el) {
-      el.textContent = `⏳ ${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`;
+    
+    const lastMsg = container.querySelector('.bubble.in:last-child');
+    const timerElem = lastMsg ? document.getElementById(lastMsg.dataset.timerId) : null;
+    if (timerElem) {
+      timerElem.textContent = `⏳ ${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`;
     }
+    
     if (timerSeconds <= 0) {
       stopTimer();
       waitingForAnswer = false;
@@ -457,7 +495,7 @@ function showQuestion(q, level) {
         if (gameOver || !waitingForAnswer || isProcessing) return;
         const isCorrect = this.dataset.correct === 'true';
         const answerText = this.dataset.answer;
-    
+        
         document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         stopTimer();
         waitingForAnswer = false;
@@ -466,7 +504,7 @@ function showQuestion(q, level) {
         if (isCorrect) {
           addMessage(`✅ Верно! ${answerText}`, 'out');
           playBeep(1200, 150);
-
+          
           setTimeout(() => {
             isProcessing = false;
             goToNextLevel(level);
@@ -474,6 +512,7 @@ function showQuestion(q, level) {
         } else {
           addMessage(`❌ Неверно. Попробуй ещё раз.`, 'out');
           playBeep(200, 300, 'square');
+          
           setTimeout(() => {
             isProcessing = false;
             if (!gameOver) {
@@ -488,6 +527,7 @@ function showQuestion(q, level) {
   }, 100);
 }
 
+// ---- Переход между уровнями ----
 function goToNextLevel(currentLevel) {
   if (gameOver) return;
   
@@ -509,7 +549,6 @@ function goToNextLevel(currentLevel) {
       showQuestion(q, nextLevel);
     }, 800);
   } else {
-    // Финал
     setTimeout(() => {
       addSystemMessage('📁 Последний файл расшифрован...');
       addMessage('Ты узнал правду. Но брат... он исчез навсегда.', 'in');
@@ -528,7 +567,12 @@ function handleTextAnswer(text) {
 }
 
 function init() {
+
+  document.addEventListener('click', initAudio, { once: true });
+  document.addEventListener('touchstart', initAudio, { once: true });
+  
   sendBtn.addEventListener('click', () => {
+    initAudio();
     const text = input.value.trim();
     if (!text) return;
     if (gameOver) return;
@@ -536,6 +580,7 @@ function init() {
     input.value = '';
     handleTextAnswer(text);
   });
+  
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendBtn.click();
   });
@@ -547,7 +592,11 @@ function init() {
   }, 800);
 }
 
-init();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 </body>
 </html>
