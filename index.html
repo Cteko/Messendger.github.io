@@ -261,358 +261,271 @@
 </div>
 
 <script>
-// ============================================================
-//  БОЛЬШАЯ БАЗА ВОПРОСОВ
-// ============================================================
-const QUESTION_BANK = {
-  easy: [
-    { q: 'Какого цвета небо?', options: ['Синий', 'Красный', 'Зелёный'], correct: 0 },
-    { q: 'Сколько у вас пальцев на руке?', options: ['5', '4', '6'], correct: 0 },
-    { q: 'Что обычно пьёте на завтрак?', options: ['Чай', 'Кофе', 'Вода'], correct: 0 },
-    { q: 'Как называется ближайшая к вам улица?', options: ['Пушкина', 'Ленина', 'Воскресенская'], correct: 2 },
-    { q: 'Какие из этих фруктов красные?', options: ['Яблоко', 'Банан', 'Виноград'], correct: 0 },
-    { q: 'Что делают кошки?', options: ['Летают', 'Мяукают', 'Рычат'], correct: 1 },
-    { q: 'В каком месте обычно хранятся книги?', options: ['В холодильнике', 'В шкафу', 'В ванной'], correct: 1 },
-    { q: 'Какая цифра больше?', options: ['10', '5', '2'], correct: 0 },
-    { q: 'Что является предметом для письма?', options: ['Лестница', 'Карандаш', 'Телефон'], correct: 1 },
-    { q: 'Какое число идёт после 3?', options: ['4', '2', '5'], correct: 0 },
-  ],
-  medium: [
-    { q: 'Какая страна славится своей пирамидой?', options: ['Мексика', 'Египет', 'Индия'], correct: 1 },
-    { q: 'Что чаще всего используют для измерения времени?', options: ['Ракета', 'Часы', 'Телефон'], correct: 1 },
-    { q: 'Какая планета ближайшая к солнцу?', options: ['Марс', 'Венера', 'Меркурий'], correct: 2 },
-    { q: 'У какого животного есть хобот?', options: ['Слон', 'Лев', 'Тигр'], correct: 0 },
-    { q: 'В каком виде спорта используется мяч и сетка?', options: ['Бейсбол', 'Волейбол', 'Гольф'], correct: 1 },
-    { q: 'Какая из этих одежд подходит для зимы?', options: ['Купальник', 'Тёплый свитер', 'Спортивные шорты'], correct: 1 },
-    { q: 'Кто написал «Войну и мир»?', options: ['Толстой', 'Достоевский', 'Чехов'], correct: 0 },
-    { q: 'Что обычно делаете с заклёпками?', options: ['Закрепляете что-то', 'Чистите зубы', 'Подаёте в суд'], correct: 0 },
-    { q: 'В каком месяце бывает Хэллоуин?', options: ['Март', 'Октябрь', 'Июль'], correct: 1 },
-    { q: 'Что из этого можно есть?', options: ['Мыло', 'Яблоко', 'Грунт'], correct: 1 },
-    { q: 'Какая из этих животных зеленого цвета?', options: ['Лампа', 'Яблоко', 'Змея'], correct: 2 },
-    { q: 'Что происходит при закипании воды?', options: ['Она замерзает', 'Вода превращается в пар', 'Вода становится темнее'], correct: 1 },
-    { q: 'Какая из этих книг принадлежит Ньютону?', options: ['Закон тяготения', 'Убийство в Восточном экспрессе', 'Гарри Поттер'], correct: 0 },
-    { q: 'Какая птица умеет повторять слова?', options: ['Орёл', 'Попугай', 'Ласточка'], correct: 1 },
-    { q: 'Где обычно происходит дождь?', options: ['В небе', 'Под землёй', 'В море'], correct: 0 },
-    { q: 'Какое число идёт после 9?', options: ['8', '10', '11'], correct: 1 },
-    { q: 'Что используют для рисования?', options: ['Карандаш', 'Молоток', 'Лупа'], correct: 0 },
-    { q: 'Какая еда из этих — овощ?', options: ['Картофель', 'Буряк', 'Всё выше'], correct: 2 },
-    { q: 'В каком месте можно «потерять голову»?', options: ['В офисе', 'В игре', 'В ситуации'], correct: 2 },
-    { q: 'Назовите вид спорта, где бьют по мячам ракетками.', options: ['Теннис', 'Футбол', 'Баскетбол'], correct: 0 },
-  ],
-  hard: [
-    { q: 'Кто написал «Гамлета»?', options: ['Шекспир', 'Толстой', 'Пушкин'], correct: 0 },
-    { q: 'Какая из планет — самая большая?', options: ['Земля', 'Юпитер', 'Сатурн'], correct: 1 },
-    { q: 'Назовите слово, которое состоит из 4 букв, и в нем есть буква «а».', options: ['Молоко', 'Лампа', 'Змея'], correct: 1 },
-    { q: 'Какие из этих городов расположены на берегу моря?', options: ['Москва', 'Санкт-Петербург', 'Новосибирск'], correct: 1 },
-    { q: 'Почему компьютер работает быстрее, если он обновлён?', options: ['Свежий воздух', 'Новая прошивка', 'Он устал'], correct: 1 },
-    { q: 'В чем разница между "кислотой" и "щелочью"?', options: ['В запахе', 'В свойствах рН', 'В цвете'], correct: 1 },
-    { q: 'Какая из этих книг написана Чарльзом Диккенсом?', options: ['Оливер Твист', 'Гарри Поттер', 'Война и мир'], correct: 0 },
-    { q: 'Что высотой выше — гора или здание?', options: ['Гора', 'Здание', 'Одинаково'], correct: 0 },
-    { q: 'Какие из этих вещей не растут на дереве?', options: ['Вишня', 'Молоко', 'Орехи'], correct: 1 },
-    { q: 'Чем отличается человек от робота?', options: ['У человека есть сердце', 'У робота есть мозг', 'У человека есть волосы'], correct: 0 },
-    { q: 'Почему снег белый?', options: ['Из-за отражения света', 'Он был крещён снегом', 'Потому что он — молоко'], correct: 0 },
-    { q: 'Какие из этих предметов связаны с погодой?', options: ['Зонт', 'Очки', 'Телефон'], correct: 0 },
-    { q: 'Кто из этих героев — русский?', options: ['Робин Гуд', 'Иван Царевич', 'Купидон'], correct: 1 },
-    { q: 'Какое насекомое умеет делать мед?', options: ['Пчела', 'Муравей', 'Комар'], correct: 0 },
-    { q: 'Что нельзя увидеть своими глазами?', options: ['Время', 'Облака', 'Птицу'], correct: 0 },
-  ],
-};
+// Простая проверка, что DOM загружен
+(function() {
+  console.log('Скрипт запущен!');
+  
+  // БАЗА ВОПРОСОВ
+  const QUESTION_BANK = {
+    easy: [
+      { q: 'Какого цвета небо?', options: ['Синий', 'Красный', 'Зелёный'], correct: 0 },
+      { q: 'Сколько у вас пальцев на руке?', options: ['5', '4', '6'], correct: 0 },
+      { q: 'Что обычно пьёте на завтрак?', options: ['Чай', 'Кофе', 'Вода'], correct: 0 },
+      { q: 'Какая цифра больше?', options: ['10', '5', '2'], correct: 0 },
+      { q: 'Что является предметом для письма?', options: ['Лестница', 'Карандаш', 'Телефон'], correct: 1 },
+    ],
+    medium: [
+      { q: 'Какая страна славится своей пирамидой?', options: ['Мексика', 'Египет', 'Индия'], correct: 1 },
+      { q: 'Что чаще всего используют для измерения времени?', options: ['Ракета', 'Часы', 'Телефон'], correct: 1 },
+      { q: 'Какая планета ближайшая к солнцу?', options: ['Марс', 'Венера', 'Меркурий'], correct: 2 },
+      { q: 'У какого животного есть хобот?', options: ['Слон', 'Лев', 'Тигр'], correct: 0 },
+      { q: 'Кто написал «Войну и мир»?', options: ['Толстой', 'Достоевский', 'Чехов'], correct: 0 },
+    ],
+    hard: [
+      { q: 'Кто написал «Гамлета»?', options: ['Шекспир', 'Толстой', 'Пушкин'], correct: 0 },
+      { q: 'Какая из планет — самая большая?', options: ['Земля', 'Юпитер', 'Сатурн'], correct: 1 },
+      { q: 'Какие из этих городов расположены на берегу моря?', options: ['Москва', 'Санкт-Петербург', 'Новосибирск'], correct: 1 },
+      { q: 'В чем разница между "кислотой" и "щелочью"?', options: ['В запахе', 'В свойствах рН', 'В цвете'], correct: 1 },
+      { q: 'Что нельзя увидеть своими глазами?', options: ['Время', 'Облака', 'Птицу'], correct: 0 },
+    ],
+  };
 
-// ============================================================
-//  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ============================================================
-function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-// ============================================================
-//  ИГРОВОЙ ДВИЖОК
-// ============================================================
-const container = document.getElementById('messageContainer');
-const input = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const statusText = document.getElementById('statusText');
-
-let currentLevel = 'intro';
-let timerInterval = null;
-let timerSeconds = 30;
-let gameOver = false;
-let waitingForAnswer = false;
-let isProcessing = false;
-let timerId = 0;
-let audioCtx = null;
-
-// ---- Инициализация аудио ----
-function initAudio() {
-  if (!audioCtx) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (_) {
-      // Если аудио не поддерживается, просто игнорируем
-      audioCtx = null;
+  // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
+    return arr;
   }
-  // Пытаемся возобновить контекст
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
-  }
-}
 
-// ---- Звуки (безопасная версия) ----
-function playBeep(freq = 800, duration = 120, type = 'sine') {
-  try {
-    initAudio();
-    if (!audioCtx) return;
-    
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    oscillator.type = type;
-    oscillator.frequency.value = freq;
-    
-    gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + duration / 1000);
-  } catch (_) {
-    // Игнорируем ошибки звука
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
   }
-}
 
-function playGlitch() { 
-  playBeep(1800, 80, 'square'); 
-  setTimeout(() => playBeep(900, 100, 'sawtooth'), 100); 
-}
+  // ПОЛУЧАЕМ ЭЛЕМЕНТЫ
+  const container = document.getElementById('messageContainer');
+  const input = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusText = document.getElementById('statusText');
 
-// ---- Добавление сообщений ----
-function addMessage(text, type = 'in', timer = null, extra = null) {
-  const div = document.createElement('div');
-  div.className = `bubble ${type}`;
-  let html = '';
-  
-  if (timer !== null && timer > 0) {
-    timerId++;
-    const uniqueTimerId = `timer_${timerId}`;
-    html += `<div class="timer-badge" id="${uniqueTimerId}">⏳ ${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}</div>`;
-    div.dataset.timerId = uniqueTimerId;
-    div.dataset.timerSeconds = timer;
+  // ПРОВЕРКА ЭЛЕМЕНТОВ
+  if (!container || !input || !sendBtn || !statusText) {
+    console.error('Ошибка: не найдены элементы DOM!');
+    return;
   }
-  
-  html += text;
-  if (extra) html += extra;
-  const timeNow = new Date();
-  const timeStr = String(timeNow.getHours()).padStart(2,'0') + ':' + String(timeNow.getMinutes()).padStart(2,'0');
-  html += `<div class="time">${timeStr}</div>`;
-  div.innerHTML = html;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  if (type !== 'out') {
-    playBeep(600, 60);
-  }
-  return div;
-}
 
-function addSystemMessage(text) {
-  const div = document.createElement('div');
-  div.className = 'system-message';
-  div.textContent = text;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  playGlitch();
-}
+  console.log('Все элементы найдены!');
 
-// ---- Таймер ----
-function startTimer(seconds) {
-  stopTimer();
-  timerSeconds = seconds;
-  waitingForAnswer = true;
-  
-  const lastMessage = container.querySelector('.bubble.in:last-child');
-  const timerEl = lastMessage ? document.getElementById(lastMessage.dataset.timerId) : null;
-  
-  if (timerEl) {
-    timerEl.textContent = `⏳ ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
-  }
-  
-  timerInterval = setInterval(() => {
-    timerSeconds--;
+  // СОСТОЯНИЕ ИГРЫ
+  let gameOver = false;
+  let waitingForAnswer = false;
+  let isProcessing = false;
+  let timerInterval = null;
+  let timerSeconds = 30;
+  let timerId = 0;
+
+  // ---- Добавление сообщений (без звука для простоты) ----
+  function addMessage(text, type = 'in', timer = null) {
+    const div = document.createElement('div');
+    div.className = `bubble ${type}`;
+    let html = '';
     
-    const lastMsg = container.querySelector('.bubble.in:last-child');
-    const timerElem = lastMsg ? document.getElementById(lastMsg.dataset.timerId) : null;
-    if (timerElem) {
-      timerElem.textContent = `⏳ ${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`;
+    if (timer !== null && timer > 0) {
+      timerId++;
+      const uniqueTimerId = `timer_${timerId}`;
+      html += `<div class="timer-badge" id="${uniqueTimerId}">⏳ ${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}</div>`;
+      div.dataset.timerId = uniqueTimerId;
     }
     
-    if (timerSeconds <= 0) {
-      stopTimer();
-      waitingForAnswer = false;
-      handleTimeout();
-    }
-  }, 1000);
-}
-
-function stopTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
+    html += text;
+    const timeNow = new Date();
+    const timeStr = String(timeNow.getHours()).padStart(2,'0') + ':' + String(timeNow.getMinutes()).padStart(2,'0');
+    html += `<div class="time">${timeStr}</div>`;
+    div.innerHTML = html;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
   }
-  waitingForAnswer = false;
-}
 
-function handleTimeout() {
-  if (gameOver) return;
-  gameOver = true;
-  addSystemMessage('⏰ ВРЕМЯ ВЫШЛО. Связь прервана...');
-  addMessage('Ты не успел. Брат... пропал навсегда.', 'in');
-  statusText.textContent = '📡 сигнал потерян';
-  input.disabled = true;
-  sendBtn.disabled = true;
-  playBeep(300, 400, 'sawtooth');
-}
+  function addSystemMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'system-message';
+    div.textContent = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
 
-// ---- Показ вопроса с кнопками ----
-function showQuestion(q, level) {
-  if (gameOver || isProcessing) return;
-  
-  isProcessing = true;
-  const shuffled = shuffleArray([...q.options]);
-  const correctAnswer = q.options[q.correct];
-  const correctIndex = shuffled.indexOf(correctAnswer);
-
-  let html = q.q;
-  html += `<div class="options">`;
-  shuffled.forEach((opt, idx) => {
-    html += `<button data-answer="${opt}" data-correct="${idx === correctIndex ? 'true' : 'false'}" class="option-btn">${opt}</button>`;
-  });
-  html += `</div>`;
-
-  addMessage(html, 'in', 30);
-  startTimer(30);
-
-  setTimeout(() => {
-    const btns = container.querySelectorAll('.option-btn');
-    btns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        if (gameOver || !waitingForAnswer || isProcessing) return;
-        const isCorrect = this.dataset.correct === 'true';
-        const answerText = this.dataset.answer;
-        
-        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  // ---- Таймер ----
+  function startTimer(seconds) {
+    stopTimer();
+    timerSeconds = seconds;
+    waitingForAnswer = true;
+    
+    const lastMessage = container.querySelector('.bubble.in:last-child');
+    const timerEl = lastMessage ? document.getElementById(lastMessage.dataset.timerId) : null;
+    
+    if (timerEl) {
+      timerEl.textContent = `⏳ ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    }
+    
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      
+      const lastMsg = container.querySelector('.bubble.in:last-child');
+      const timerElem = lastMsg ? document.getElementById(lastMsg.dataset.timerId) : null;
+      if (timerElem) {
+        timerElem.textContent = `⏳ ${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`;
+      }
+      
+      if (timerSeconds <= 0) {
         stopTimer();
         waitingForAnswer = false;
-        isProcessing = true;
+        handleTimeout();
+      }
+    }, 1000);
+  }
 
-        if (isCorrect) {
-          addMessage(`✅ Верно! ${answerText}`, 'out');
-          playBeep(1200, 150);
-          
-          setTimeout(() => {
-            isProcessing = false;
-            goToNextLevel(level);
-          }, 1000);
-        } else {
-          addMessage(`❌ Неверно. Попробуй ещё раз.`, 'out');
-          playBeep(200, 300, 'square');
-          
-          setTimeout(() => {
-            isProcessing = false;
-            if (!gameOver) {
-              const newQ = pickRandom(QUESTION_BANK[level]);
-              showQuestion(newQ, level);
-            }
-          }, 1200);
-        }
-      });
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    waitingForAnswer = false;
+  }
+
+  function handleTimeout() {
+    if (gameOver) return;
+    gameOver = true;
+    addSystemMessage('⏰ ВРЕМЯ ВЫШЛО. Связь прервана...');
+    addMessage('Ты не успел. Брат... пропал навсегда.', 'in');
+    statusText.textContent = '📡 сигнал потерян';
+    input.disabled = true;
+    sendBtn.disabled = true;
+  }
+
+  // ---- Показ вопроса ----
+  function showQuestion(q, level) {
+    if (gameOver || isProcessing) return;
+    
+    isProcessing = true;
+    const shuffled = shuffleArray([...q.options]);
+    const correctAnswer = q.options[q.correct];
+    const correctIndex = shuffled.indexOf(correctAnswer);
+
+    let html = q.q;
+    html += `<div class="options">`;
+    shuffled.forEach((opt, idx) => {
+      html += `<button data-correct="${idx === correctIndex ? 'true' : 'false'}" class="option-btn">${opt}</button>`;
     });
-    isProcessing = false;
-  }, 100);
-}
+    html += `</div>`;
 
-// ---- Переход между уровнями ----
-function goToNextLevel(currentLevel) {
-  if (gameOver) return;
-  
-  const levelOrder = ['easy', 'medium', 'hard'];
-  const currentIndex = levelOrder.indexOf(currentLevel);
-  
-  if (currentLevel === 'intro' || currentIndex === -1) {
+    addMessage(html, 'in', 30);
+    startTimer(30);
+
     setTimeout(() => {
+      const btns = container.querySelectorAll('.option-btn');
+      btns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          if (gameOver || !waitingForAnswer || isProcessing) return;
+          const isCorrect = this.dataset.correct === 'true';
+          const answerText = this.textContent;
+          
+          document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+          stopTimer();
+          waitingForAnswer = false;
+          isProcessing = true;
+
+          if (isCorrect) {
+            addMessage(`✅ Верно! ${answerText}`, 'out');
+            setTimeout(() => {
+              isProcessing = false;
+              goToNextLevel(level);
+            }, 1000);
+          } else {
+            addMessage(`❌ Неверно. Попробуй ещё раз.`, 'out');
+            setTimeout(() => {
+              isProcessing = false;
+              if (!gameOver) {
+                const newQ = pickRandom(QUESTION_BANK[level]);
+                showQuestion(newQ, level);
+              }
+            }, 1200);
+          }
+        });
+      });
+      isProcessing = false;
+    }, 100);
+  }
+
+  // ---- Переход между уровнями ----
+  function goToNextLevel(currentLevel) {
+    if (gameOver) return;
+    
+    const levelOrder = ['easy', 'medium', 'hard'];
+    const currentIndex = levelOrder.indexOf(currentLevel);
+    
+    if (currentIndex < levelOrder.length - 1) {
+      const nextLevel = levelOrder[currentIndex + 1];
+      setTimeout(() => {
+        const q = pickRandom(QUESTION_BANK[nextLevel]);
+        showQuestion(q, nextLevel);
+      }, 800);
+    } else {
+      // Финал
+      setTimeout(() => {
+        addSystemMessage('📁 Последний файл расшифрован...');
+        addMessage('Ты узнал правду. Но брат... он исчез навсегда.', 'in');
+        addMessage('Или нет? Возможно, это только начало.', 'in');
+        statusText.textContent = '📴 история завершена';
+        input.disabled = true;
+        sendBtn.disabled = true;
+        gameOver = true;
+      }, 1000);
+    }
+  }
+
+  // ---- Обработка ввода ----
+  function handleTextAnswer(text) {
+    addSystemMessage('⛔ Используй кнопки для ответа!');
+  }
+
+  // ---- ИНИЦИАЛИЗАЦИЯ ----
+  function init() {
+    console.log('Инициализация игры...');
+    
+    sendBtn.addEventListener('click', function() {
+      const text = input.value.trim();
+      if (!text) return;
+      if (gameOver) return;
+      addMessage(text, 'out');
+      input.value = '';
+      handleTextAnswer(text);
+    });
+    
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
+    addSystemMessage('🔓 доступ к аккаунту брата получен · файлы зашифрованы');
+    setTimeout(function() {
       const q = pickRandom(QUESTION_BANK.easy);
       showQuestion(q, 'easy');
     }, 800);
-    return;
+    
+    console.log('Игра инициализирована!');
   }
-  
-  if (currentIndex < levelOrder.length - 1) {
-    const nextLevel = levelOrder[currentIndex + 1];
-    setTimeout(() => {
-      const q = pickRandom(QUESTION_BANK[nextLevel]);
-      showQuestion(q, nextLevel);
-    }, 800);
+
+  // Запускаем инициализацию
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    setTimeout(() => {
-      addSystemMessage('📁 Последний файл расшифрован...');
-      addMessage('Ты узнал правду. Но брат... он исчез навсегда.', 'in');
-      addMessage('Или нет? Возможно, это только начало.', 'in');
-      statusText.textContent = '📴 история завершена';
-      input.disabled = true;
-      sendBtn.disabled = true;
-      gameOver = true;
-      playBeep(1000, 200);
-    }, 1000);
+    init();
   }
-}
-
-// ---- Обработка ввода ----
-function handleTextAnswer(text) {
-  addSystemMessage('⛔ Используй кнопки для ответа!');
-}
-
-// ---- Инициализация ----
-function init() {
-  // Инициализируем аудио при первом клике
-  document.addEventListener('click', initAudio, { once: true });
-  document.addEventListener('touchstart', initAudio, { once: true });
-  
-  sendBtn.addEventListener('click', () => {
-    initAudio(); // Активируем аудио при отправке
-    const text = input.value.trim();
-    if (!text) return;
-    if (gameOver) return;
-    addMessage(text, 'out');
-    input.value = '';
-    handleTextAnswer(text);
-  });
-  
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendBtn.click();
-  });
-
-  addSystemMessage('🔓 доступ к аккаунту брата получен · файлы зашифрованы');
-  setTimeout(() => {
-    const q = pickRandom(QUESTION_BANK.easy);
-    showQuestion(q, 'easy');
-  }, 800);
-}
-
-// Запускаем инициализацию после загрузки страницы
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+})();
 </script>
 </body>
 </html>
