@@ -294,11 +294,9 @@
 </div>
 
 <script>
-// ============================================================
-//  БОЛЬШАЯ БАЗА ВОПРОСОВ (из вашего файла)
-// ============================================================
+
 const QUESTION_BANK = {
-  // ---- Обычные (простые) ----
+  // ---- простые ----
   easy: [
     { q: 'Какого цвета небо?', options: ['Синий', 'Красный', 'Зелёный'], correct: 0 },
     { q: 'Сколько у вас пальцев на руке?', options: ['5', '4', '6'], correct: 0 },
@@ -355,7 +353,7 @@ const QUESTION_BANK = {
     { q: 'Что нельзя увидеть своими глазами?', options: ['Время', 'Облака', 'Птицу'], correct: 0 },
   ],
 
-  // ---- Странные (редкие, но не хулиганские) ----
+  // ---- Странные ----
   weird: [
     { q: 'Что из этого звучит вкуснее по четвергам?', options: ['Слон в тюрбане', 'Квадратное молоко', 'Музыкальный веник'], correct: 1 },
     { q: 'Какой цвет лучше всего пахнет на ощупь?', options: ['Семь', 'Льдина', 'Кофейник'], correct: 2 },
@@ -369,7 +367,7 @@ const QUESTION_BANK = {
     { q: 'Что случится, если перемножить луну на велосипед?', options: ['Получится абонемент на утюги', 'Вырастет два фонаря', 'Откроется шляпа разговора'], correct: 0 },
   ],
 
-  // ---- Хулиганские (ВСЕ ОТВЕТЫ ПРАВИЛЬНЫЕ! РЕДКИЕ) ----
+  // ---- Хулиганские ----
   hooligan: [
     { q: 'Док, а если я скажу «раз-два-три, разрежь и собери», вы реально так и делаете?', options: ['Конечно, это наш секретный код', 'Только по пятницам', 'Если пациент попросит'], correct: 0 },
     { q: 'Вы по пятницам тоже операции делаете налево, а швы направо?', options: ['А вы наблюдательный', 'Только в полнолуние', 'Зависит от настроения'], correct: 0 },
@@ -384,9 +382,6 @@ const QUESTION_BANK = {
   ]
 };
 
-// ============================================================
-//  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ============================================================
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -399,9 +394,6 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// ============================================================
-//  ИГРОВОЙ ДВИЖОК
-// ============================================================
 const container = document.getElementById('messageContainer');
 const input = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -516,7 +508,6 @@ function handleTimeout() {
 
 // ---- Генерация вопроса без повторений ----
 function generateQuestion() {
-  // Определяем уровень сложности (прогрессия)
   let pool;
   if (questionIndex < 8) {
     currentLevel = 'easy';
@@ -529,7 +520,6 @@ function generateQuestion() {
     pool = QUESTION_BANK.hard;
   }
 
-  // Редкий шанс на странный вопрос (10%)
   if (Math.random() < 0.10 && QUESTION_BANK.weird.length > 0) {
     const available = QUESTION_BANK.weird.filter(q => !usedQuestions.includes(q));
     if (available.length > 0) {
@@ -539,21 +529,17 @@ function generateQuestion() {
     }
   }
 
-  // Очень редкий шанс на хулиганский вопрос (5%) — ВСЕ ОТВЕТЫ ПРАВИЛЬНЫЕ
   if (Math.random() < 0.05 && QUESTION_BANK.hooligan.length > 0) {
     const available = QUESTION_BANK.hooligan.filter(q => !usedQuestions.includes(q));
     if (available.length > 0) {
       const q = pickRandom(available);
       usedQuestions.push(q);
-      // Делаем все ответы правильными (индекс 0, но для красоты помечаем все как правильные)
       return { ...q, level: 'hooligan', allCorrect: true };
     }
   }
 
-  // Обычный вопрос из текущего пула
   const available = pool.filter(q => !usedQuestions.includes(q));
   if (available.length === 0) {
-    // Если все вопросы использованы — берём любой
     const fallback = pickRandom(pool);
     usedQuestions.push(fallback);
     return { ...fallback, level: currentLevel };
@@ -563,11 +549,9 @@ function generateQuestion() {
   return { ...q, level: currentLevel };
 }
 
-// ---- Показ вопроса ----
 function showQuestion() {
   if (gameOver) return;
 
-  // Проверяем, не закончились ли вопросы
   if (questionIndex >= TOTAL_QUESTIONS) {
     finishGame();
     return;
@@ -576,10 +560,7 @@ function showQuestion() {
   const q = generateQuestion();
   const isHooligan = q.level === 'hooligan';
   const isWeird = q.level === 'weird';
-
-  // Перемешиваем варианты
   const shuffled = shuffleArray([...q.options]);
-  // Для хулиганских — все правильные, для остальных — один правильный
   const correctAnswer = q.options[q.correct];
   const correctIndex = shuffled.indexOf(correctAnswer);
 
@@ -625,7 +606,7 @@ function showQuestion() {
         } else {
           addMessage(`❌ Неверно. Попробуй ещё раз.`, 'out');
           playBeep(200, 300, 'square');
-          // Даём второй шанс с новым вопросом
+
           setTimeout(() => {
             if (!gameOver && questionIndex < TOTAL_QUESTIONS) {
               showQuestion();
@@ -651,7 +632,6 @@ function finishGame() {
   playBeep(1000, 200);
 }
 
-// ---- Инициализация ----
 function init() {
   input.disabled = true;
   sendBtn.disabled = true;
